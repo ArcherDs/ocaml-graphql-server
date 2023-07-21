@@ -2014,16 +2014,14 @@ module Make (Io : IO) (Field_error : Field_error) = struct
     ?mutations:('ctx, unit) field list ->
     ?subscription_name:string ->
     ?subscriptions:'ctx subscription_field list ->
-    ?query_name:string -> ('ctx, unit option) typ ->
+    ('ctx, unit option) typ ->
     'ctx schema = 
     fun ?(mutation_name = "mutation") ?mutations
-      ?(subscription_name = "subscription") ?subscriptions
-      ?(query_name = "query") obj ->
-
+        ?(subscription_name = "subscription") ?subscriptions obj ->
     let schema  = {
       query = (match obj with 
-      | Object { fields; _ } -> {
-        name = query_name;
+      | Object { name; fields; _ } -> {
+        name = name;
         doc = None;
         abstracts = ref [];
         fields = fields;
