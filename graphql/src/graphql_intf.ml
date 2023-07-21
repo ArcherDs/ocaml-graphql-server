@@ -66,7 +66,6 @@ module type Schema = sig
     ?mutations:('ctx, unit) field list ->
     ?subscription_name:string ->
     ?subscriptions:'ctx subscription_field list ->
-    ?query_name:string ->
     ('ctx, unit option) typ ->
     'ctx schema
 
