@@ -67,7 +67,7 @@ module type Schema = sig
     ?subscription_name:string ->
     ?subscriptions:'ctx subscription_field list ->
     ?query_name:string ->
-    ('ctx, unit) field list ->
+    ('ctx, unit option) typ ->
     'ctx schema
 
   type deprecated = NotDeprecated | Deprecated of string option
