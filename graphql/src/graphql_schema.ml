@@ -2009,7 +2009,7 @@ module Make (Io : IO) (Field_error : Field_error) = struct
     in
     execute' schema ctx doc >>| to_response
 
-  let schema :
+  let schema2 :
     ?mutation_name:string ->
     ?mutations:('ctx, unit) field list ->
     ?subscription_name:string ->
@@ -2027,6 +2027,40 @@ module Make (Io : IO) (Field_error : Field_error) = struct
         fields = fields;
       } 
       | _ -> failwith "Root query must be an object");
+      mutation =
+        Option.map mutations ~f:(fun fields ->
+            {
+              name = mutation_name;
+              doc = None;
+              abstracts = ref [];
+              fields = lazy fields;
+            });
+      subscription =
+        Option.map subscriptions ~f:(fun fields ->
+            { name = subscription_name; doc = None; fields });
+    }
+    in
+    let types = Introspection.types_of_schema schema in
+    Introspection.add_built_in_fields schema types
+  let schema :
+    ?mutation_name:string ->
+    ?mutations:('ctx, unit) field list ->
+    ?subscription_name:string ->
+    ?subscriptions:'ctx subscription_field list ->
+    ?query_name:string ->
+      ('ctx, unit) field list ->
+    'ctx schema = 
+    fun ?(mutation_name = "mutation") ?mutations
+        ?(subscription_name = "subscription") ?subscriptions
+        ?(query_name = "query") fields ->
+    let schema  = {
+      query =
+      {
+        name = query_name;
+        doc = None;
+        abstracts = ref [];
+        fields = lazy fields;
+      };
       mutation =
         Option.map mutations ~f:(fun fields ->
             {
